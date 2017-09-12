@@ -26,6 +26,9 @@
 *.a
 *.lib
 
+# Some vim trash
+*.swp
+
 # Executables
 *.exe
 *.out
