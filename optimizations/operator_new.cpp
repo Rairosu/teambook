@@ -1,6 +1,6 @@
 /*
  * Increases speed of memory allocating and deleting.
- * Memory doesn't reallocated. May cause MLE or RE.
+ * Memory doesn't reallocates. May cause MLE or RE.
  */
 
 const int SZ = 5e7;
