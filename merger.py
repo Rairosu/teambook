@@ -1,5 +1,5 @@
 ###
-### This script merges all '.cpp' files into 1
+### This script merges all '.cpp' files into "merged.txt"
 ###
 
 import os
