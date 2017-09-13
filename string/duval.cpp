@@ -7,7 +7,7 @@
 
 string min_cyclic_shift(string s) {
     s += s;
-    int n = (int)s.length();
+    int n = int(s.length());
     int i = 0;
     int ans = 0;
     while (i < n / 2) {
@@ -23,5 +23,5 @@ string min_cyclic_shift(string s) {
         }
         while (i <= k) i += j - k;
     }
-    return s.substr (ans, n / 2);
+    return s.substr(ans, n / 2);
 }

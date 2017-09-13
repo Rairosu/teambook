@@ -6,7 +6,7 @@
  */
 
 void manacher(string s) {
-    int n = s.size();
+    int n = int(s.size());
     vector<int> d1(n);
     vector<int> d2(n);
     int l = -1;
