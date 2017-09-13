@@ -13,3 +13,5 @@ This is an ACM ICPC teambook of HSE Miracle team.
 ### string
 * Manacher
 * Duval
+### data structures
+* Segment tree
