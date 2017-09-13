@@ -28,6 +28,7 @@
 
 # Some vim trash
 *.swp
+*.DS_Store
 
 # Executables
 *.exe
