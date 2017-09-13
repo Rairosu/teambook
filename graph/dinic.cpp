@@ -2,7 +2,7 @@
  * This file contains realization of Dinic algorithm.
  * For given graph 'g' finds maximal flow in O(EV^2).
  *
- * MAXN - maximal number of vertex in G
+ * MAXN - maximal number of vertexes in G
  * s - start vertex
  * t - end vertex
  *
