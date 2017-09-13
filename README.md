@@ -15,3 +15,4 @@ This is an ACM ICPC teambook of HSE Miracle team.
 * Duval
 ### data structures
 * Segment tree
+* MO's algorithm
