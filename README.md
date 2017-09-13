@@ -10,6 +10,7 @@ This is an ACM ICPC teambook of HSE Miracle team.
 ### graph
 * Dinic
 * hungarian algorithm
+* Kuhn algorithm
 ### string
 * Manacher
 * Duval
