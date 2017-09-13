@@ -70,13 +70,13 @@ long long dfs(long long v, long long flow) {
 
 long long dinic() {
     long long flow = 0;
-    for (long long lim = 1 << 30; lim >= 1; ) {
+    for (long long lim = 1 << 30; lim >= 1;) {
         if (!bfs()) {
             lim >>= 1;
             continue;
         }
         memset(ptr, 0, MAXN * sizeof ptr[0]);
-        while (long long pushed = dfs (s, lim))
+        while (long long pushed = dfs(s, lim))
             flow += pushed;
     }
     return flow;
