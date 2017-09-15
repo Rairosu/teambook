@@ -1,5 +1,5 @@
 /*
- * This file contains realization of convex hull algo.
+ * Convex hull(Graham's traversal).
  *
  * Complexity: O(NlogN)
  *
