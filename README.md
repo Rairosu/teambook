@@ -11,7 +11,7 @@ This is an ACM ICPC teambook of HSE Miracle team.
 * [operator new](https://github.com/Hippskill/teambook/tree/master/optimizatios/operator_new.cpp)
 ### [graph](https://github.com/Hippskill/teambook/tree/master/graph/)
 * [Dinic](https://github.com/Hippskill/teambook/tree/master/graph/dinic.cpp)
-* [hungarian algorithm](https://github.com/Hippskill/teambook/tree/master/graph/hungaria  n.cpp)
+* [hungarian algorithm](https://github.com/Hippskill/teambook/tree/master/graph/hungarian.cpp)
 * [Kuhn algorithm](https://github.com/Hippskill/teambook/tree/master/graph/kuhn.cpp)
 * [bridges](https://github.com/Hippskill/teambook/tree/master/graph/bridges.cpp)
 * [strongly connected components](https://github.com/Hippskill/teambook/tree/master/graph/find_scc.cpp)
