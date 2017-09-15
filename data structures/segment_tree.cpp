@@ -1,11 +1,9 @@
 /*
- * This file contains realization of segment tree.
+ * Segment tree with lazy propagation.
  *
  * Build complexity: O(N)
- * add complexity: O(logN)
- * get complexity: O(logN)
+ * queries complexity: O(logN)
  *
- * Requirements: "vector"
  */
 
 
