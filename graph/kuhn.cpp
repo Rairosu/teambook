@@ -15,8 +15,7 @@ vector<char> used;
 bool kuhn_step(int v) {
     if (used[v]) return false;
     used[v] = true;
-    for (size_t i = 0; i < g[v].size(); ++i) {
-        int to = g[v][i];
+    for (auto to : g[v]) {
         if (mt[to] == -1 || kuhn_step(mt[to])) {
             mt[to] = v;
             return true;
