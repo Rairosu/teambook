@@ -5,7 +5,7 @@
  * Complexity: O(n).
  *
  * Usage:
- *   - lp[x] = true if x is prime
+ *   - lp[x] = x if x is prime
  *   - pr contains all primes <= N
  *
  */
