@@ -2,7 +2,7 @@
  *
  * Fast Fourier Transformation.
  *
- * Complexity: O(nlogn).
+ * Complexity: O(NlogN).
  *
  *
  */
