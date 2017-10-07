@@ -5,7 +5,7 @@
  * Complexity: O(n).
  *
  * Usage:
- *   - lp[x] = x if x is prime
+ *   - lp[x] = minimal y such that x divisible by y
  *   - pr contains all primes <= N
  *
  */

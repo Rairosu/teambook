@@ -1,0 +1,72 @@
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+filetype plugin indent on
+
+" Configure backspace so it acts as it should act
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+set mouse=a
+set nu
+set encoding=utf-8
+set laststatus=2
+
+set clipboard=unnamed
+
+"Move anywhere
+set virtualedit=all
+"Auto reload file
+set autoread
+"Show line number
+set number
+"Set 7 lines to the cursor - when moving vertically using j/k
+set so=7
+"Turn on the Wild menu
+set wildmenu
+"Always show current position
+set ruler
+"Height of th cmd
+set cmdheight=1
+"Show matching brackets when text indicator is over them
+set showmatch
+"How many tenths of a second to blink when matching brackets
+set mat=2
+"Split to right
+set splitright
+set splitbelow
+
+"Enable syntax highlighting
+syntax enable
+colorscheme desert
+
+set term=xterm-256color
+set t_Co=256
+set ttymouse=xterm2
+
+set background=dark
+
+" Be smart when using tabs ;)
+set smarttab
+
+" 1 tab == 4 spaces
+set shiftwidth=4
+set tabstop=4
+set shiftround                  "Round spaces to nearest shiftwidth multiple
+set nojoinspaces                "Don't convert spaces to tabs
+set expandtab
+
+set ai "Auto indent
+set si "Smart indent
+set wrap "Wrap lines
+
+
+map <F2> <C-w>j
+map <F3> <C-w>k
+command RWorkspace :80vsplit input.txt <bar> 40vsplit output.txt <bar>:normal <C-w>h<C-w>h
+command Workspace :12split input.txt <bar> vsplit output.txt <bar>:normal <C-w>k
+
+
+au filetype cpp set makeprg=c++\ -Wall\ -Wextra\ -std=c++11\ -O2\ -o\ r_%:r.out\ %\ &&\ ./r_%:r.out
+au filetype python set makeprg=python3\ %
+
