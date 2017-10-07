@@ -2,19 +2,26 @@
 This is an ACM ICPC teambook of HSE Miracle team.
 
 
-### geometry
-* point class
-* convex hull
-### optimizatios
-* fast io
-* operator new
-### graph
-* Dinic
-* hungarian algorithm
-* Kuhn algorithm
-### string
-* Manacher
-* Duval
-### data structures
-* Segment tree
-* MO's algorithm
+### [geometry](https://github.com/Hippskill/teambook/tree/master/geometry)
+* [point class](https://github.com/Hippskill/teambook/tree/master/geometry/point.cpp)
+* [convex hull](https://github.com/Hippskill/teambook/tree/master/geometry/convex_hull.cpp)
+* [planes check](https://github.com/Hippskill/teambook/tree/master/geometry/planes_check.cpp)
+### [optimizatios](https://github.com/Hippskill/teambook/tree/master/optimizatios)
+* [fast io](https://github.com/Hippskill/teambook/tree/master/optimizatios/fast_io.cpp)
+* [operator new](https://github.com/Hippskill/teambook/tree/master/optimizatios/operator_new.cpp)
+### [graph](https://github.com/Hippskill/teambook/tree/master/graph/)
+* [Dinic](https://github.com/Hippskill/teambook/tree/master/graph/dinic.cpp)
+* [hungarian algorithm](https://github.com/Hippskill/teambook/tree/master/graph/hungarian.cpp)
+* [Kuhn algorithm](https://github.com/Hippskill/teambook/tree/master/graph/kuhn.cpp)
+* [bridges](https://github.com/Hippskill/teambook/tree/master/graph/bridges.cpp)
+* [strongly connected components](https://github.com/Hippskill/teambook/tree/master/graph/find_scc.cpp)
+### [string](https://github.com/Hippskill/teambook/tree/master/string)
+* [Manacher](https://github.com/Hippskill/teambook/tree/master/string/manacher.cpp)
+* [Duval](https://github.com/Hippskill/teambook/tree/master/string/duval.cpp)
+### [data structures](https://github.com/Hippskill/teambook/tree/master/data%20structures)
+* [Segment tree](https://github.com/Hippskill/teambook/tree/master/data%20structures/segment_tree.cpp)
+* [MO's algorithm](https://github.com/Hippskill/teambook/tree/master/data%20structures/mo.cpp)
+* [Cartesian tree](https://github.com/Hippskill/teambook/tree/master/data%20structures/cartesian_tree.cpp)
+* [Cartesian tree with pushes](https://github.com/Hippskill/teambook/tree/master/data%20structures/cartesian_tree_push.cpp)
+### [numbers theory](https://github.com/Hippskill/teambook/tree/master/numbers%20theory)
+* [linear sieve](https://github.com/Hippskill/teambook/tree/master/numbers%20theory/linear_sieve.cpp)
