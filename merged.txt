@@ -1,0 +1,1224 @@
+/*
+ * This file contains Mo's algorithm signature.
+ * This is sqrt decomposition of queries.
+ *
+ * Complexity: sorting O(nlogn), suppose add/remove comlexity is O(g), then
+ *             overall comlexity is O(Q \sqrt{Q} g)
+ *
+ * Requirements: "algorithm"
+ */
+
+
+sort(q, q + Q, cmp);
+
+int l = 0;
+int r = 0;
+for(int i = 0; i < Q; i++){
+    int L = q[i].l;
+    int R = q[i].r;
+    while(curl < L){
+        // remove 'l'
+        ++l;
+    }
+    while(curl > L){
+        // add 'l - 1'
+        --l;
+    }
+    while(curr <= R){
+        // add 'r'
+        r++;
+    }
+    while(curr > R + 1){
+        // remove 'r - 1'
+        curr--;
+    }
+}
+
+
+
+
+/*
+ * Segment tree with lazy propagation.
+ *
+ * Build complexity: O(N)
+ * queries complexity: O(logN)
+ *
+ */
+
+
+template<class ValueType>
+class SumSegmentTree {
+ public:
+     SumSegmentTree() = default;
+     SumSegmentTree(int sz) : tree(sz * 4), pushing(sz * 4), size(sz) {}
+     SumSegmentTree(vector<ValueType> a, int size) : SumSegmentTree(size) {
+         build(a, 1, 0, size);
+     }
+
+     int add(int l, int r, ValueType delta) {
+         return add(1, 0, size - 1, l, r, delta);
+     }
+
+     int add(int p, ValueType delta) {
+         return add(1, 0, size - 1, p, p, delta);
+     }
+
+     int get(int l, int r) {
+         return get(1, 0, size - 1, l, r);
+     }
+
+ private:
+     ValueType merge(int v, int u) {
+         return tree[v] + pushing[v] + tree[u] + pushing[u];
+     }
+
+     void push(int v) {
+         tree[v] += pushing[v];
+         pushing[v + v] += pushing[v];
+         pushing[v + v + 1] += pushing[v];
+         pushing[v] = 0;
+     }
+
+     void build(vector<ValueType>& a, int v, int tl, int tr) {
+         if (tl == tr) {
+             tree[v] = a[tl];
+         } else {
+             int mid = (tl + tr) / 2;
+             build(a, v + v, tl, mid);
+             build(a, v + v + 1, mid + 1, tr);
+             tree[v] = merge(v + v, v + v + 1);
+         }
+     }
+
+     void add(int v, int tl, int tr, int l, int r, ValueType delta) {
+         if (l > r) {
+             return;
+         }
+         if (l == tl && r == tr) {
+             pushing[v] += delta;
+             return;
+         }
+         push(v);
+         int mid = (tl + tr) / 2;
+         add(v + v, tl, mid, l, min(r, mid), delta);
+         add(v + v + 1, mid + 1, tr, max(l, mid + 1), r, delta);
+         tree[v] = merge(v + v, v + v + 1);
+     }
+
+     ValueType get(int v, int tl, int tr, int l, int r) {
+         if (l > r) {
+             return 0;
+         }
+         if (l == tl && r == tr) {
+             return tree[v] + pushing[v];
+         }
+         push(v);
+         int mid = (tl + tr) / 2;
+         return get(v + v, tl, mid, l, min(r, mid)) +
+                 get(v + v + 1, mid + 1, tr, max(l, mid + 1), r);
+     }
+
+     vector<ValueType> tree;
+     vector<ValueType> pushing;
+     size_t size;
+};
+
+
+
+
+/*
+ *
+ * Persistent segment tree.
+ *
+ * Complexity: O(logN).
+ *
+ * Usage:
+ *   - Init: Create array of roots and place empty Node()
+ *   - Update: roots.push_back(update(roots.back(), ...))
+ *   - Get: get(roots[r], ...) - get(roots[l - 1], ...)
+ *
+ */
+
+
+struct Node {
+    int val, sum;
+    Node *left, *right;
+    Node(int val = 0) : val(val), sum(0), left(nullptr), right(nullptr) {}
+    Node(const Node& v) : val(v.val), sum(v.sum), left(v.left), right(v.right) {}
+};
+
+int get_sum(Node *node) {
+    return node? node->sum : 0;
+}
+
+Node* update(Node *v, int tl, int tr, int pos, int val) {
+    Node *u = v? new Node(*v) : new Node();
+    if (tl == tr) {
+        u->sum = val;
+        u->val = val;
+        return u;
+    }
+    int tm = (tl + tr) / 2;
+    if (pos <= tm)
+        u->left = update(u->left, tl, tm, pos, val);
+    else
+        u->right = update(u->right, tm + 1, tr, pos, val);
+    u->sum = get_sum(u->left) + get_sum(u->right);
+    return u;
+}
+
+
+int get(Node *v, int tl, int tr, int l, int r) {
+    if (v == nullptr)
+        return 0;
+    if (l > r)
+        return 0;
+    if (tl == l && tr == r)
+        return v->sum;
+    int tm = (tl + tr) / 2;
+    return get(v->left, tl, tm, l, min(r, tm)) +
+           get(v->right, tm + 1, tr, max(l, tm + 1), r);
+}
+
+
+
+
+/*
+ * Cartesian tree with implicit keys.
+ * Operation: min_element on segment.
+ *
+ * Build complexity: O(NlogN)
+ * split/merge complexity: O(logN)
+ *
+ * Usage:
+ *   - initialize root with nullptr
+ *   - split(root, x) returns tree with keys <= x
+ *
+ */
+
+
+struct Node {
+    int val;
+    int size, y;
+    int min_e, min_i;
+    Node *left, *right;
+    Node(int val = 0)
+            : val(val), size(1), y(rand()),
+              min_e(val), min_i(0),
+              left(nullptr), right(nullptr) { }
+};
+
+int get_size(Node *node) {
+    return node != nullptr? node->size : 0;
+}
+
+void recalc(Node *node) {
+    node->size = get_size(node->left) + get_size(node->right) + 1;
+    int mv = node->val;
+    int pos = get_size(node->left);
+    if (node->left != nullptr) {
+        if (mv >= node->left->min_e) {
+            mv = node->left->min_e;
+            pos = node->left->min_i;
+        }
+    }
+    if (node->right != nullptr) {
+        if (mv > node->right->min_e) {
+            mv = node->right->min_e;
+            pos = get_size(node->left) + 1 + node->right->min_i;
+        }
+    }
+    node->min_e = mv;
+    node->min_i = pos;
+}
+
+pair<Node*, Node*> split(Node *root, int val) {
+    if (root == nullptr)
+        return mp(nullptr, nullptr);
+    int x = get_size(root->left);
+    if (x <= val) {
+        pair<Node*, Node*> splitted = split(root->right, val - x - 1);
+        root->right = splitted.first;
+        recalc(root);
+        return mp(root, splitted.second);
+    } else {
+        pair<Node*, Node*> splitted = split(root->left, val);
+        root->left = splitted.second;
+        recalc(root);
+        return mp(splitted.first, root);
+    }
+}
+
+Node* merge(Node *left, Node *right) {
+    if (left == nullptr)
+        return right;
+    if (right == nullptr)
+        return left;
+    if (left->y > right->y) {
+        left->right = merge(left->right, right);
+        recalc(left);
+        return left;
+    } else {
+        right->left = merge(left, right->left);
+        recalc(right);
+        return right;
+    }
+}
+
+
+
+
+/*
+ * Cartesian tree with implicit keys and lazy propagation.
+ * Operations: insert, add on segment, sum on segment, left-right traversal.
+ *
+ * Build complexity: O(NlogN)
+ * queries complexity: O(logN)
+ *
+ */
+
+#define ll long long
+
+struct Node {
+    ll push, sum;
+    ll val;
+    ll size, y;
+    Node *left, *right;
+    Node(ll val = 0)
+            : val(val), size(1), y(rand()),
+              push(-1), sum(val),
+              left(nullptr), right(nullptr) { }
+};
+
+
+ll get_push(Node *node) {
+    return node != nullptr? node->push : -1;
+}
+
+ll get_size(Node *node) {
+    return node != nullptr? node->size : 0;
+}
+
+ll get_sum(Node *node) {
+    return node != nullptr? node->sum : 0;
+}
+
+void push(Node *v) {
+    if (v == nullptr || v->push == -1)
+        return;
+    if (v->left)
+        v->left->push = v->push;
+    if (v->right)
+        v->right->push = v->push;
+    v->val = v->push;
+    v->sum = v->push * v->size;
+    v->push = -1;
+}
+
+void recalc(Node *node) {
+    node->size = get_size(node->left) + get_size(node->right) + 1;
+    if (node->push != -1)
+        node->sum = node->push * node->size;
+    else {
+        ll left_sum, right_sum;
+        if (get_push(node->left) != -1)
+            left_sum = get_push(node->left) * get_size(node->left);
+        else left_sum = get_sum(node->left);
+        if (get_push(node->right) != -1)
+            right_sum = get_push(node->right) * get_size(node->right);
+        else right_sum = get_sum(node->right);
+        node->sum = left_sum + right_sum + node->val;
+    }
+}
+
+pair<Node*, Node*> split(Node *root, ll val) {
+    push(root);
+    if (root == nullptr)
+        return mp(nullptr, nullptr);
+    ll x = get_size(root->left);
+    if (x <= val) {
+        pair<Node*, Node*> splitted = split(root->right, val - x - 1);
+        root->right = splitted.first;
+        recalc(root);
+        return mp(root, splitted.second);
+    } else {
+        pair<Node*, Node*> splitted = split(root->left, val);
+        root->left = splitted.second;
+        recalc(root);
+        return mp(splitted.first, root);
+    }
+}
+
+Node* merge(Node *left, Node *right) {
+    push(left);
+    push(right);
+    if (left == nullptr)
+        return right;
+    if (right == nullptr)
+        return left;
+    if (left->y > right->y) {
+        left->right = merge(left->right, right);
+        recalc(left);
+        return left;
+    } else {
+        right->left = merge(left, right->left);
+        recalc(right);
+        return right;
+    }
+}
+
+void insert(Node *&root, ll pos, ll val) {
+    pair<Node*, Node*> splitted = split(root, pos - 1);
+    root = merge(merge(splitted.first, new Node(val)), splitted.second);
+}
+
+void update(Node *&root, ll l, ll r, ll add) {
+    pair<Node*, Node*> splitted = split(root, l - 1);
+    pair<Node*, Node*> splitted2 = split(splitted.second, r - l);
+    splitted2.first->push = add;
+    root = merge(splitted.first, merge(splitted2.first, splitted2.second));
+}
+
+ll get(Node *&root, ll l, ll r) {
+    pair<Node*, Node*> splitted = split(root, l - 1);
+    pair<Node*, Node*> splitted2 = split(splitted.second, r - l);
+    ll res = splitted2.first->sum;
+    root = merge(splitted.first, merge(splitted2.first, splitted2.second));
+    return res;
+}
+
+vector<ll> all;
+
+void get_all(Node *root) {
+    if (root == nullptr)
+        return;
+    get_all(root->left);
+    all.push_back(root->val);
+    get_all(root->right);
+}
+
+
+
+
+/*
+ *
+ * Fast Fourier Transformation.
+ *
+ * Complexity: O(NlogN).
+ *
+ *
+ */
+
+const double PI = acos(-1.0);
+
+const int MAXN = 550500;
+
+typedef complex<double> base;
+
+int rev[MAXN];
+base wlen_pw[MAXN];
+base fa[MAXN], fb[MAXN];
+ 
+void fft(base *a, int n, bool invert) {
+	for (int i = 0; i < n; ++i)
+		if (i < rev[i])
+			swap (a[i], a[rev[i]]);
+ 
+	for (int len = 2; len <= n; len <<= 1) {
+		double ang = 2 * PI / len * (invert? -1 : +1);
+		int len2 = len >> 1;
+ 
+		base wlen(cos(ang), sin(ang));
+		wlen_pw[0] = base(1, 0);
+		for (int i = 1; i < len2; ++i)
+			wlen_pw[i] = wlen_pw[i - 1] * wlen;
+ 
+		for (int i = 0; i < n; i += len) {
+			base t,
+				*pu = a + i,
+				*pv = a + i + len2, 
+				*pu_end = a + i + len2,
+				*pw = wlen_pw;
+			for (; pu != pu_end; ++pu, ++pv, ++pw) {
+				t = *pv * *pw;
+				*pv = *pu - t;
+				*pu += t;
+			}
+		}
+	}
+ 
+	if (invert)
+		for (int i = 0; i < n; ++i)
+			a[i] /= n;
+}
+ 
+void calc_rev (int n, int log_n) {
+	for (int i = 0; i < n; ++i) {
+		rev[i] = 0;
+		for (int j = 0; j < log_n; ++j)
+			if (i & (1 << j))
+				rev[i] |= 1 << (log_n - 1 - j);
+	}
+}
+
+
+void multiply (const vector<int> &a, const vector<int> &b, vector<int> &res) {
+    int n = 1;
+    int nl = 1;
+    while (n < max (a.size(), b.size()))  n <<= 1, ++nl;
+    n <<= 1;
+    calc_rev(n, nl);
+    for (int i = 0; i < n; ++i) {
+        if (i < a.size())
+            fa[i] = base(a[i], 0);
+        else
+            fa[i] = base();
+        if (i < b.size())
+            fb[i] = base(b[i], 0);
+        else
+            fb[i] = base();
+    }
+
+    fft (fa, n, false);
+    fft (fb, n, false);
+    for (int i = 0; i < n; ++i)
+        fa[i] *= fb[i];
+    fft (fa, n, true);
+
+    res.resize (n);
+    for (int i = 0; i < n; ++i)
+        res[i] = (int)(fa[i].real() + 0.5);
+}
+
+
+
+
+/*
+ *
+ * Eratosthenes' sieve.
+ *
+ * Complexity: O(n).
+ *
+ * Usage:
+ *   - lp[x] = minimal y such that x divisible by y
+ *   - pr contains all primes <= N
+ *
+ */
+
+const int N = (int)1e7;
+int lp[N + 1];
+vector<int> pr;
+ 
+void sieve() {
+    for (int i = 2; i <= N; ++i) {
+        if (lp[i] == 0) {
+            lp[i] = i;
+            pr.push_back(i);
+        }
+        for (int j = 0; j < (int)pr.size() &&
+                pr[j] <= lp[i] && i * pr[j] <= N; ++j)
+            lp[i * pr[j]] = pr[j];
+    }
+}
+
+
+
+/*
+ * This file contains realiztaion of Kuhn algorithm.
+ * For given bipartite graph 'g' finds maximum matching.
+ *
+ * Comlexity: O(EV)
+ *
+ * Requirements: "vector"
+ */
+
+int n, k;
+vector<vector<int>> g;
+vector<int> mt;
+vector<char> used;
+
+bool kuhn_step(int v) {
+    if (used[v]) return false;
+    used[v] = true;
+    for (auto to : g[v]) {
+        if (mt[to] == -1 || kuhn_step(mt[to])) {
+            mt[to] = v;
+            return true;
+        }
+    }
+    return false;
+}
+
+void kuhn() {
+    mt.assign(k, -1);
+    for (int v = 0; v < n; ++v) {
+        used.assign(n, false);
+        kuhn_step(v);
+    }
+}
+
+
+
+
+/*
+ * This file contains realization of hungarian algorithm.
+ * 
+ * Complexity: O(N^3)
+ *
+ * Requirements: "vector"
+ */
+
+
+int hungarian(vector<vector<int>> g, int n) {
+    vector<int> u(n + 1), v(n + 1), p(n + 1), way(n + 1);
+    for (int i = 1; i <= n; ++i) {
+        p[0] = i;
+        int j0 = 0;
+        vector<int> minv(n + 1, inf);
+        vector<char> used(n + 1, false);
+        do {
+            used[j0] = true;
+            int i0 = p[j0], delta = inf, j1;
+            for (int j = 1; j <= n; ++j)
+                if (!used[j]) {
+                    int cur = g[i0][j] - u[i0] - v[j];
+                    if (cur < minv[j])
+                        minv[j] = cur,  way[j] = j0;
+                    if (minv[j] < delta)
+                        delta = minv[j], j1 = j;
+                }
+            for (int j = 0; j <= n; ++j)
+                if (used[j])
+                    u[p[j]] += delta, v[j] -= delta;
+                else
+                    minv[j] -= delta;
+            j0 = j1;
+        } while (p[j0] != 0);
+        do {
+            int j1 = way[j0];
+            p[j0] = p[j1];
+            j0 = j1;
+        } while (j0);
+    }
+    return -v[0];
+}
+
+
+
+
+/*
+ *
+ * Find strongly connected components.
+ *
+ * Complexity: O(N + M).
+ *
+ * Usage:
+ *   - g is adjacency table of graph, gr is g reversed
+ *
+ */
+
+
+
+vector<vector<int>> g, gr;
+vector<char> used;
+vector<int> order, component;
+ 
+void dfs1 (int v) {
+	used[v] = true;
+	for (int i = 0; i < g[v].size(); ++i)
+		if (!used[g[v][i]])
+			dfs1(g[v][i]);
+	order.push_back (v);
+}
+ 
+void dfs2 (int v) {
+	used[v] = true;
+	component.push_back (v);
+	for (int i = 0; i < gr[v].size(); ++i)
+		if (!used[gr[v][i]])
+			dfs2(gr[v][i]);
+}
+ 
+void find_scc() {
+	for (int i = 0; i < n; ++i)
+		if (!used[i])
+			dfs1(i);
+	used.assign (n, false);
+	for (int i = 0; i < n; ++i) {
+		int v = order[n - 1 - i];
+		if (!used[v]) {
+			dfs2 (v);
+            // print component
+			component.clear();
+		}
+	}
+}
+
+
+
+/*
+ * Find bridges.
+ *
+ * Complexity: O(N + M).
+ *
+ */
+
+
+vector<vector<int>> g;
+vector<char> used;
+vector<int> timer, tin, fup;
+ 
+void dfs (int v, int p = -1) {
+	used[v] = true;
+	tin[v] = fup[v] = timer++;
+	for (int i = 0; i < g[v].size(); ++i) {
+		int to = g[v][i];
+		if (to == p)  continue;
+		if (used[to])
+			fup[v] = min(fup[v], tin[to]);
+		else {
+			dfs (to, v);
+			fup[v] = min(fup[v], fup[to]);
+			if (fup[to] > tin[v])
+				// edge (v - to) is bridge
+		}
+	}
+}
+ 
+void find_bridges() {
+	timer = 0;
+	for (int i = 0; i < n; ++i)
+		used[i] = false;
+	for (int i = 0; i < n; ++i)
+		if (!used[i])
+			dfs(i);
+}
+
+
+
+/*
+ * This file contains realization of Dinic algorithm.
+ * For given graph 'g' finds maximal flow in O(EV^2).
+ *
+ * MAXN - maximal number of vertexes in G
+ * s - start vertex
+ * t - end vertex
+ *
+ * dinic() - runs algorithm, returns max flow
+ * add_edge(a, b, cap) - add edge from 'a' to 'b' with capacity 'cap'
+ *
+ * Requirements: "vector", "cstring"
+ */
+
+const long long MAXN = 505;
+const long long inf = 1e18;
+
+struct edge {
+    long long a, b, cap, flow;
+};
+
+long long n, s, t, d[MAXN], ptr[MAXN], q[MAXN];
+vector<edge> e;
+vector<long long> g[MAXN];
+
+void add_edge(long long a, long long b, long long cap) {
+    edge e1 = { a, b, cap, 0 };
+    edge e2 = { b, a, 0, 0 };
+    g[a].push_back(e.size());
+    e.push_back(e1);
+    g[b].push_back(e.size());
+    e.push_back(e2);
+}
+
+bool bfs() {
+    long long qh = 0, qt = 0;
+    q[qt++] = s;
+    memset(d, -1, MAXN * sizeof d[0]);
+    d[s] = 0;
+    while (qh < qt && d[t] == -1) {
+        long long v = q[qh++];
+        for (size_t i = 0; i < g[v].size(); ++i) {
+            long long id = g[v][i],
+                    to = e[id].b;
+            if (d[to] == -1 && e[id].flow < e[id].cap) {
+                q[qt++] = to;
+                d[to] = d[v] + 1;
+            }
+        }
+    }
+    return d[t] != -1;
+}
+
+long long dfs(long long v, long long flow) {
+    if (!flow) return 0;
+    if (v == t) return flow;
+    for (; ptr[v] < g[v].size(); ++ptr[v]) {
+        long long id = g[v][ptr[v]],
+                to = e[id].b;
+        if (d[to] != d[v] + 1)  continue;
+        long long pushed = dfs(to, min(flow, e[id].cap - e[id].flow));
+        if (pushed) {
+            e[id].flow += pushed;
+            e[id ^ 1].flow -= pushed;
+            return pushed;
+        }
+    }
+    return 0;
+}
+
+long long dinic() {
+    long long flow = 0;
+    for (long long lim = 1 << 30; lim >= 1;) {
+        if (!bfs()) {
+            lim >>= 1;
+            continue;
+        }
+        memset(ptr, 0, MAXN * sizeof ptr[0]);
+        while (long long pushed = dfs(s, lim))
+            flow += pushed;
+    }
+    return flow;
+}
+
+
+
+
+/*
+ * Increases speed of reading and writting integers.
+ *
+ */
+
+void writeInt(int x) {
+    char s[10];
+    int n = 0;
+    while (x || !n)
+        s[n++] = '0' + x % 10, x /= 10;
+    while (n--)
+        putc(s[n], stdout);
+    putc('\n', stdout);
+}
+
+int readInt() {
+    int s = 1, x = 0, c = getc(stdin);
+    while (c <= 32)
+        c = getc(stdin);
+    if (c == '-')
+        s = -1, c = getc(stdin);
+    while ('0' <= c && c <= '9')
+        x = x * 10 + c - '0', c = getc(stdin);
+    return x * s;
+}
+
+
+
+/*
+ * Increases speed of memory allocating and deleting.
+ * Memory doesn't reallocates. May cause MLE or RE.
+ */
+
+const int SZ = 5e7;
+char buf[SZ];
+int pos;
+
+void * operator new(size_t x) {
+    pos += x;
+    if (pos > SZ) {
+        throw 42;
+    }
+    return buf + pos - x;
+}
+
+void operator delete(void *x) {}
+
+
+
+/*
+ *  This file contains Manacher algo realization.
+ *  For given string 's' finds all subpalindromes in O(n).
+ *
+ *  Requirements: "string", "vector"
+ */
+
+void manacher(string s) {
+    int n = int(s.size());
+    vector<int> d1(n);
+    vector<int> d2(n);
+    int l = -1;
+    int r = -1;
+    for(int i = 0; i < n; i++) {
+        int k = i > r ? 1 : min(d1[l + r - i], r - i);
+        while (0 <= i - k && i + k < n && s[i - k] == s[i + k])
+            k++;
+        d1[i] = k;
+        if(i + k - 1 > r) {
+            r = i + k - 1;
+            l = i - k + 1;
+        }
+    }
+    for(int i = 0; i < n; i++) {
+        int k = i > r? 0 : min(d2[l + r - i + 1], r - i + 1);
+        while (0 <= i - k - 1 && i + k < n && s[i + k] == s[i - k - 1])
+            k++;
+        d2[i] = k;
+        if(i + k - 1 > r) {
+            l = i - k;
+            r = i + k - 1;
+        }
+    }
+}
+
+
+
+ /*
+  *
+  * Calculate prefix function of string.
+  *
+  * Complexity: O(N).
+  *
+  *
+  */
+
+vector<int> prefix_function(string s) {
+	int n = (int)s.length();
+	vector<int> pi(n);
+	for (int i = 1; i < n; ++i) {
+		int j = pi[i - 1];
+		while (j > 0 && s[i] != s[j])
+			j = pi[j - 1];
+		if (s[i] == s[j])
+            ++j;
+		pi[i] = j;
+	}
+	return pi;
+}
+
+
+
+/*
+ * This file contains realization of Duval algorithm.
+ * For given string 's' finds minimal cyclic shift in O(n).
+ *
+ * Requirements: "string"
+ */
+
+string min_cyclic_shift(string s) {
+    s += s;
+    int n = int(s.length());
+    int i = 0;
+    int ans = 0;
+    while (i < n / 2) {
+        ans = i;
+        int j = i + 1;
+        int k = i;
+        while (j < n && s[k] <= s[j]) {
+            if (s[k] < s[j])
+                k = i;
+            else
+                ++k;
+            ++j;
+        }
+        while (i <= k) i += j - k;
+    }
+    return s.substr(ans, n / 2);
+}
+
+
+
+/*
+ *
+ * Polynomial hashing.
+ *
+ * Complexity: O(N).
+ *
+ */
+
+
+const ll mod = (ll)1e9 + 7;
+
+ll p = rand() % 100 + 100;
+
+
+ll h[MAXN], deg[MAXN];
+
+void hashing(string s) {
+
+    h[0] = 0, deg[0] = 1;
+    for (int i = 0; i < s.size(); i++) {
+        h[i + 1] = (h[i] * p) % mod + s[i];
+        h[i + 1] %= mod;
+        deg[i + 1] = (deg[i] * p) % mod;
+    }
+    auto get_hash = [&]( int l, int r) { // [l..r]
+        return ((h[r + 1] - (h[l] * deg[r - l + 1]) % mod) % mod + mod) % mod;
+    };
+}
+
+
+
+/*
+ * Checks if union of half-planes has non-zero area.
+ *
+ * Expected complexity: O(n).
+ *
+ */
+
+
+#define ld long double
+
+const ld inf = 1e9;
+const ld eps = 1e-9;
+
+inline ld det(ld a, ld b, ld c, ld d) {
+    return a * d - b * c;
+}
+
+struct line {
+    ld a, b, c;
+    line(ld a = 0, ld b = 0, ld c = 0) : a(a), b(b), c(c) {}
+    line(pt p, pt q) {
+        a = p.y - q.y;
+        b = q.x - p.x;
+        c = -a * p.x - b * p.y;
+        ld g = hypot(a, b);
+        a /= g;
+        b /= g;
+        c /= g;
+    }
+
+    ld get_y(ld x) const {
+        return -(a/b * x + c / b);
+    }
+    ld get_val(pt p) const {
+        return a * p.x + b * p.y + c;
+    }
+
+    pt intersect(const line& p) const {
+        ld d = det(a, b, p.a, p.b);
+        if (fabs(d) > eps) {
+            pt res;
+            res.x = -det(c, b, p.c, p.b) / d;
+            res.y = -det(a, c, p.a, p.c) / d;
+            return res;
+        }
+        assert(false);
+    }
+
+    bool equivalent(const line &p) const {
+        return fabs(det(a, b, p.a, p.b)) < eps
+               && fabs(det(a, c, p.a, p.c)) < eps
+               && fabs(det(b, c, p.b, p.c)) < eps;
+    }
+
+    bool parallel(const line& p) const {
+        return fabs(det (a, b, p.a, p.b)) < eps;
+    }
+};
+
+pair<ld, ld> intersect(pair<ld, ld> a, pair<ld, ld> b) {
+    return {max(min(a.first, a.second), min(b.first, b.second)),
+            min(max(a.first, a.second), max(b.first, b.second))};
+}
+
+bool check(vector<line>& a) {
+    random_shuffle(a.begin(), a.end());
+    a.push_back(line({-inf, -inf}, {-inf, inf}));
+    a.push_back(line({-inf, inf}, {inf, inf}));
+    a.push_back(line({inf, inf}, {inf, -inf}));
+    a.push_back(line({inf, -inf}, {-inf, -inf}));
+    reverse(a.begin(), a.end());
+    for (int i = 0; i < 4; ++i) {
+        a[i].a *= -1;
+        a[i].b *= -1;
+        a[i].c *= -1;
+    }
+    pt p(-inf, inf);
+    int res = 0;
+    for (int i = 4; i < a.size(); ++i) {
+        if (a[i].get_val(p) < eps) {
+            pair<ld, ld> xx = {-inf, inf};
+            for (int j = 0; j < i; ++j) {
+                if (a[i].parallel(a[j])) {
+                    pt q(1.0, a[i].get_y(1.0));
+                    if (a[j].get_val(q) < eps)
+                        return false;
+                } else {
+                    pt q = a[i].intersect(a[j]);
+                    pt q2(q.x - 1.0, a[i].get_y(q.x - 1.0));
+                    if (a[j].get_val(q2) > -eps) {
+                        xx = intersect(xx, {-inf, q.x});
+                    } else {
+                        xx = intersect(xx, {q.x, inf});
+                    }
+                }
+                if (xx.second - xx.first < -eps)
+                    return false;
+            }
+            if (xx.second - xx.first > -eps) {
+                pt p1(xx.first, a[i].get_y(xx.first));
+                pt p2(xx.second, a[i].get_y(xx.second));
+                if (p1.y - p2.y > -eps)
+                    p = p1;
+                else
+                    p = p2;
+            } else {
+                return false;
+            }
+        }
+        ++res;
+    }
+    return true;
+}
+
+
+
+/*
+ * This file contains realization of Point class.
+ *
+ * Requirements: "iostream", "cmath", "double_utils"
+ */
+
+class Point {
+ public:
+    double x;
+    double y;
+    Point() = default;
+    Point(double x, double y) : x(x), y(y) {}
+
+    void scan() {
+        scanf("%lf %lf", &x, &y);
+    }
+
+    void print() const {
+        printf("%.15lf %.15lf\n", x, y);
+    }
+
+    Point operator+(const Point& other) const {
+        return Point(x + other.x, y + other.y);
+    }
+
+    Point operator-(const Point& other) const {
+        return Point(x - other.x, y - other.y);
+    }
+
+    Point operator-() const {
+        return Point(-x, -y);
+    }
+
+    Point operator*(double k) const {
+        return Point(x * k, y * k);
+    }
+
+    Point operator/(double k) const {
+        return Point(x / k, y / k);
+    }
+
+    bool operator==(const Point& other) const {
+        return double_equal(x, other.x) && double_equal(y, other.y);
+    }
+
+    double operator%(const Point& other) const {
+        return x * other.x + y * other.y;
+    }
+
+    double operator*(const Point& other) const {
+        return x * other.y - y * other.x;
+    }
+
+    double Length() const {
+        return sqrt(*this % (*this));
+    }
+
+    double DistTo(const Point& other) const {
+        return (*this - other).Length();
+    }
+
+    double DistTo(const Point& first, const Point& second) const {
+        double dist = first.DistTo(second);
+        if (double_equal(dist, 0)) {
+            return -1;
+        }
+        double area = (*this - first) * (*this - second);
+        return fabs(area) / dist;
+    }
+
+    Point Normalize(double k = 1) const {
+        double len = Length();
+        if (double_equal(len, 0) ) {
+            return Point();
+        }
+        return *this * (k / len);
+    }
+
+    Point GetH(const Point & A, const Point & B) const {
+        Point C = *this;
+        Point v = B - A;
+        Point u = C - A;
+        double k = v % u / v.Length();
+        v = v.Normalize(k);
+        Point H = A + v;
+        return H;
+    }
+};
+
+
+
+/*
+ * Convex hull(Graham's traversal).
+ *
+ * Complexity: O(NlogN)
+ *
+ * Requrements: "point class"
+ */
+
+bool cmp(Point a, Point b) {
+     return a.x < b.x || a.x == b.x && a.y < b.y;
+}
+
+bool cw(Point a, Point b, Point c) {
+     return a.x * (b.y - c.y) +
+            b.x * (c.y - a.y) +
+            c.x * (a.y - b.y) < 0;
+}
+
+bool ccw(Point a, Point b, Point c) {
+     return a.x * (b.y - c.y) +
+            b.x * (c.y - a.y) +
+            c.x * (a.y - b.y) > 0;
+}
+
+void convex_hull(vector<Point>& a) {
+     if (a.size() == 1) return;
+     sort(a.begin(), a.end(), &cmp);
+     Point p1 = a[0];
+     Point p2 = a.back();
+     vector<Point> up, down;
+     up.push_back(p1);
+     down.push_back(p1);
+     for (size_t i = 1; i < a.size(); ++i) {
+          if (i == a.size() - 1 || cw(p1, a[i], p2)) {
+               while (up.size() >= 2 &&
+                      !cw(up[up.size() - 2], up[up.size() - 1], a[i])) {
+                    up.pop_back();
+               }
+               up.push_back (a[i]);
+          }
+          if (i == a.size() - 1 || ccw(p1, a[i], p2)) {
+               while (down.size() >= 2 &&
+                      !ccw(down[down.size() - 2], down[down.size() - 1], a[i])) {
+                    down.pop_back();
+               }
+               down.push_back(a[i]);
+          }
+     }
+     a.clear();
+     for (size_t i = 0; i < up.size(); ++i) {
+          a.push_back(up[i]);
+     }
+     for (size_t i = down.size() - 2; i > 0; --i) {
+          a.push_back(down[i]);
+     }
+}
+
+
+
+

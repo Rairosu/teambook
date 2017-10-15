@@ -4,7 +4,19 @@
  *
  * Complexity: O(NlogN).
  *
+ * You can calc fft for 2 polynomials in one run:
+ *   fa = A(x) + i*B(x)
+ *   fa = fft(fa)
  *
+ *   fft(A) = (fa[i] + conj(fa[(n - i) % n])) / base(2, 0)
+ *   fft(B) = (fa[i] - conj(fa[(n - i) % n])) / base(0, 2)
+ *
+ * And you can calc inverse fft:
+ *   fb = fft(A) + i*fft(B)
+ *   fb = inverse_fft(fb)
+ *
+ *   A = fb[i].real()
+ *   B = fb[i].imag()
  */
 
 const double PI = acos(-1.0);
@@ -14,77 +26,59 @@ const int MAXN = 550500;
 typedef complex<double> base;
 
 int rev[MAXN];
-base wlen_pw[MAXN];
-base fa[MAXN], fb[MAXN];
- 
-void fft(base *a, int n, bool invert) {
-	for (int i = 0; i < n; ++i)
-		if (i < rev[i])
-			swap (a[i], a[rev[i]]);
- 
-	for (int len = 2; len <= n; len <<= 1) {
-		double ang = 2 * PI / len * (invert? -1 : +1);
-		int len2 = len >> 1;
- 
-		base wlen(cos(ang), sin(ang));
-		wlen_pw[0] = base(1, 0);
-		for (int i = 1; i < len2; ++i)
-			wlen_pw[i] = wlen_pw[i - 1] * wlen;
- 
-		for (int i = 0; i < n; i += len) {
-			base t,
-				*pu = a + i,
-				*pv = a + i + len2, 
-				*pu_end = a + i + len2,
-				*pw = wlen_pw;
-			for (; pu != pu_end; ++pu, ++pv, ++pw) {
-				t = *pv * *pw;
-				*pv = *pu - t;
-				*pu += t;
-			}
-		}
-	}
- 
-	if (invert)
-		for (int i = 0; i < n; ++i)
-			a[i] /= n;
-}
- 
-void calc_rev (int n, int log_n) {
-	for (int i = 0; i < n; ++i) {
-		rev[i] = 0;
-		for (int j = 0; j < log_n; ++j)
-			if (i & (1 << j))
-				rev[i] |= 1 << (log_n - 1 - j);
-	}
-}
+base fa[MAXN];
 
 
-void multiply (const vector<int> &a, const vector<int> &b, vector<int> &res) {
-    int n = 1;
-    int nl = 1;
-    while (n < max (a.size(), b.size()))  n <<= 1, ++nl;
-    n <<= 1;
-    calc_rev(n, nl);
-    for (int i = 0; i < n; ++i) {
-        if (i < a.size())
-            fa[i] = base(a[i], 0);
-        else
-            fa[i] = base();
-        if (i < b.size())
-            fb[i] = base(b[i], 0);
-        else
-            fb[i] = base();
+void fft(base *a, int lg, bool inv) {
+    int n = (1 << lg);
+    for(int i = 1; i < n; i++) {
+        rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (lg - 1));
+        if(rev[i] < i)
+            swap(a[i], a[rev[i]]);
     }
 
-    fft (fa, n, false);
-    fft (fb, n, false);
-    for (int i = 0; i < n; ++i)
-        fa[i] *= fb[i];
-    fft (fa, n, true);
+    for(int len = 2; len <= n; len <<= 1) {
+        double ang = 2 * PI / len;
+        if (inv)
+            ang *= -1.0;
+        base w(1, 0), wn(cos(ang), sin(ang));
+        for(int j = 0; j < (len >> 1); j++, w = w * wn)
+            for(int i = 0; i < n; i += len) {
+                base u = a[i + j], v = w * a[i + j + (len >> 1)];
+                a[i + j] = u + v;
+                a[i + j + (len >> 1)] = u - v;
+            }
+    }
+    if (inv) {
+        for(int i = 0; i < n; i++)
+            a[i] /= n;
+    }
+}
 
-    res.resize (n);
+
+void multiply(const vector<int> &a, const vector<int> &b, vector<int> &res) {
+    int n = 1, lg = 1;
+    while (n < max (a.size(), b.size()))
+        n <<= 1, ++lg;
+    n <<= 1;
+    for (int i = 0; i < n; ++i) {
+        if (i < a.size() && i < b.size())
+            fa[i] = base(a[i], b[i]);
+        else if (i < a.size())
+            fa[i] = base(a[i], 0);
+        else if (i < b.size())
+            fa[i] = base(0, b[i]);
+        else
+            fa[i] = base(0, 0);
+    }
+
+    fft (fa, lg, false);
     for (int i = 0; i < n; ++i)
-        res[i] = (int)(fa[i].real() + 0.5);
+        fa[i] *= fa[i];
+    fft (fa, lg, true);
+
+    res.resize(n);
+    for (int i = 0; i < n; ++i)
+        res[i] = (int)(fa[i].imag() / 2.0 + 0.5);
 }
 
