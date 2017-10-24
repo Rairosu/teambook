@@ -26,5 +26,5 @@ This is an ACM ICPC teambook of HSE Miracle team.
 * [Cartesian tree](https://github.com/Hippskill/teambook/tree/master/data%20structures/cartesian_tree.cpp)
 * [Cartesian tree with pushes](https://github.com/Hippskill/teambook/tree/master/data%20structures/cartesian_tree_push.cpp)
 ### [number theory](https://github.com/Hippskill/teambook/tree/master/numbers%20theory)
-* [linear sieve](https://github.com/Hippskill/teambook/tree/master/numbers%20theory/linear_sieve.cpp)
-* [fft](https://github.com/Hippskill/teambook/tree/master/numbers%20theory/fft.cpp)
+* [linear sieve](https://github.com/Hippskill/teambook/tree/master/number%20theory/linear_sieve.cpp)
+* [fft](https://github.com/Hippskill/teambook/tree/master/number%20theory/fft.cpp)
