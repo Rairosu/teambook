@@ -13,6 +13,7 @@ This is an ACM ICPC teambook of HSE Miracle team.
 * [Dinic](https://github.com/Hippskill/teambook/tree/master/graph/dinic.cpp)
 * [hungarian algorithm](https://github.com/Hippskill/teambook/tree/master/graph/hungarian.cpp)
 * [Kuhn algorithm](https://github.com/Hippskill/teambook/tree/master/graph/kuhn.cpp)
+* [Min cost max flow](https://github.com/Hippskill/teambook/tree/master/graph/min_cost_max_flow.cpp)
 * [bridges](https://github.com/Hippskill/teambook/tree/master/graph/bridges.cpp)
 * [strongly connected components](https://github.com/Hippskill/teambook/tree/master/graph/find_scc.cpp)
 ### [string](https://github.com/Hippskill/teambook/tree/master/string)
