@@ -19,6 +19,7 @@ This is an ACM ICPC teambook of HSE Miracle team.
 ### [string](https://github.com/Hippskill/teambook/tree/master/string)
 * [Manacher](https://github.com/Hippskill/teambook/tree/master/string/manacher.cpp)
 * [Duval](https://github.com/Hippskill/teambook/tree/master/string/duval.cpp)
+* [Suffix auto](https://github.com/Hippskill/teambook/tree/master/string/suffix_auto.cpp)
 * [Pi function](https://github.com/Hippskill/teambook/tree/master/string/prefix_function.cpp)
 ### [data structures](https://github.com/Hippskill/teambook/tree/master/data%20structures)
 * [Segment tree](https://github.com/Hippskill/teambook/tree/master/data%20structures/segment_tree.cpp)
