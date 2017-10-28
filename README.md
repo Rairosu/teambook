@@ -16,6 +16,7 @@ This is an ACM ICPC teambook of HSE Miracle team.
 * [Min cost max flow](https://github.com/Hippskill/teambook/tree/master/graph/min_cost_max_flow.cpp)
 * [bridges](https://github.com/Hippskill/teambook/tree/master/graph/bridges.cpp)
 * [strongly connected components](https://github.com/Hippskill/teambook/tree/master/graph/find_scc.cpp)
+* [Centroid](https://github.com/Hippskill/teambook/tree/master/graph/centroid.cpp)
 ### [string](https://github.com/Hippskill/teambook/tree/master/string)
 * [Manacher](https://github.com/Hippskill/teambook/tree/master/string/manacher.cpp)
 * [Duval](https://github.com/Hippskill/teambook/tree/master/string/duval.cpp)
