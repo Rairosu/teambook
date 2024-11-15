@@ -1,6 +1,11 @@
 /*
  * This file contains realiztaion of Kuhn algorithm.
  * For given bipartite graph 'g' finds maximum matching.
+ * 
+ * This implementation expects a bipartite graph comprised of disjount sets G1 and G2 with sizes n and k.
+ * g[i] contains all possible matches (from G2) for a node i (from G1).
+ * 
+ * NOTE: This algorithm is faster if n < k.
  *
  * Comlexity: O(EV)
  *
