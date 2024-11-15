@@ -1,0 +1,77 @@
+%!TEX root=./Teambook.tex
+\documentclass{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{hyperref}
+\usepackage[UKenglish]{babel}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyvrb,newverbs}
+\usepackage{ulem}
+\usepackage{placeins}
+\usepackage{pdflscape}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage[square,numbers]{natbib}
+\usepackage[UKenglish]{babel}                % Nutze Deutsch als Sprache
+
+\graphicspath{{images/}}
+
+\newverbcommand{\cverb}
+    {\setbox\verbbox\hbox\bgroup}
+    {\egroup\colorbox{backcolour}{\box\verbbox}}
+
+% Listings formatieren
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{1,1,1}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\renewcommand{\ttdefault}{pcr}
+\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+
+
+
+\setlength{\topmargin}{0cm}
+\setlength{\headheight}{10pt}
+\setlength{\headsep}{20pt}
+\setlength{\topskip}{0pt}
+\setlength{\evensidemargin}{0pt}
+\setlength{\oddsidemargin}{0pt}
+\setlength{\textheight}{250mm}
+\setlength{\textwidth}{210mm}
+\setlength{\voffset}{-1.5cm}
+\setlength{\hoffset}{-23mm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\title{
+\includegraphics[height=2cm]{RUBlogo} \\
+\vspace{1cm}
+Teambook Team RUB \\
+\vspace{7mm}
+\large{Ruhr-Universität Bochum\vspace{1cm}}
+}
+
+\begin{document}

@@ -1,0 +1,8 @@
+[[output]]
+name = "Teambook"
+index = "Teambook"
+type = "pdf"
+
+[doc]
+bundle = "https://data1.fullyjustified.net/tlextras-2022.0r0.tar"
+name = "Teambook"
